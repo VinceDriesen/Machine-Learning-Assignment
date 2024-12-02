@@ -1,0 +1,8 @@
+https://ieeexplore.ieee.org/abstract/document/8285747?casa_token=8OIfyUuTMsYAAAAA:UJw_EtSSrKymnJh4dKJ6NrH-TZ-I0MujdhrybWwGGQz2Ey7rOXU_DIah66pgDmCEk61VnPYuNuEq
+A comparative study on trend forecasting approach for stock price time series
+
+https://www.sciencedirect.com/science/article/pii/S266682702100030X
+Forecasting Stock Prices: Stylized Facts, Technical Indicators and Neural Networks
+
+https://www.researchgate.net/publication/221165259_Financial_Time_Series_Forecasting_with_Machine_Learning_Techniques_A_Survey
+Financial Time Series Forecasting with Machine Learning Techniques: A Survey
