@@ -17,6 +17,8 @@ def create_test_train_data(train_file=None, test_file=None, full_file=None):
         convert_date_to_datetime(data)
         plot_data(data)
 
+        data.drop('Date', axis=1, inplace=True)
+
         X = data.drop(Y_COLUMN, axis=1)
         y = data[Y_COLUMN]
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, random_state=42)
@@ -33,6 +35,8 @@ def create_test_train_data(train_file=None, test_file=None, full_file=None):
         convert_date_to_datetime(test_data)
         plot_data(train_data)
         plot_data(test_data)
+
+        data.drop('Date', axis=1, inplace=True)
 
         X_train = train_data.drop(Y_COLUMN, axis=1)
         y_train = train_data[Y_COLUMN]
