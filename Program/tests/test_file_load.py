@@ -32,7 +32,7 @@ def test_create_test_train_data(tmp_path, mock_data):
     file_path = tmp_path / "test_data.csv"
     mock_data.to_csv(file_path, index=False)
 
-    X_train, y_train, X_test, y_test = create_test_train_data(file_path)
+    X_train, y_train, X_test, y_test = create_test_train_data(full_file=file_path)
 
     assert len(X_train) > 0, "Training set is empty"
     assert len(X_test) > 0, "Testing set is empty"
