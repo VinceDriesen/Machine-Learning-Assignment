@@ -7,21 +7,38 @@ FEATURES = ['Date', 'Open', 'High', 'Low']
 COLUMN_HEADERS = FEATURES + [Y_COLUMN]
 TEST_SIZE = 0.2
 
-def create_test_train_data(file_path):
-    data = pd.read_csv(file_path)
+def create_test_train_data(train_file=None, test_file=None, full_file=None):
+    if full_file:
+        data = pd.read_csv(full_file)
+        try:
+            get_column_names(data)
+        except ValueError as e:
+            print(e)
+        convert_date_to_datetime(data)
+        plot_data(data)
 
-    try:
-        get_column_names(data)
-    except ValueError as e:
-        print(e)
+        X = data.drop(Y_COLUMN, axis=1)
+        y = data[Y_COLUMN]
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, random_state=42)
+        return X_train, y_train, X_test, y_test
+    else:
+        train_data = pd.read_csv(train_file)
+        test_data = pd.read_csv(test_file)
+        try:
+            get_column_names(train_data)
+            get_column_names(test_data)
+        except ValueError as e:
+            print(e)
+        convert_date_to_datetime(train_data)
+        convert_date_to_datetime(test_data)
+        plot_data(train_data)
+        plot_data(test_data)
 
-    convert_date_to_datetime(data)
-    plot_data(data)
-
-    X = data.drop(Y_COLUMN, axis=1)
-    y = data[Y_COLUMN]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, random_state=42)
-    return X_train, y_train, X_test, y_test
+        X_train = train_data.drop(Y_COLUMN, axis=1)
+        y_train = train_data[Y_COLUMN]
+        X_test = test_data.drop(Y_COLUMN, axis=1)
+        y_test = test_data[Y_COLUMN]
+        return X_train, y_train, X_test, y_test
 
 def convert_date_to_datetime(data):
     data['Date'] = pd.to_datetime(data['Date'])
