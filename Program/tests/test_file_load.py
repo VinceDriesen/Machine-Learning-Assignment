@@ -18,7 +18,7 @@ def test_get_column_names(mock_data):
     assert get_column_names(mock_data) == True
 
     incomplete_data = mock_data.drop(columns=['Open'])
-    with pytest.raises(ValueError, match="Missing column\(s\): Open"):
+    with pytest.raises(ValueError, match=r"Missing column\(s\): Open"):
         get_column_names(incomplete_data)
 
 def test_convert_date_to_datetime(mock_data):
