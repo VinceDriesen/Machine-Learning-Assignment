@@ -3,6 +3,9 @@ import torch.nn as nn
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_percentage_error
 
+from src.models.long_short_term_memory import prepare_sequences
+
+
 # RNN Model
 class RNNRegressor(nn.Module):
     def __init__(self, input_dim, hidden_dim, num_layers, output_dim):

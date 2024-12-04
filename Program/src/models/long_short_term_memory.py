@@ -73,6 +73,8 @@ def calculate_lstm_regressor(X_train, y_train, X_test, y_test, timesteps=5, epoc
 def prepare_sequences(X, y, timesteps):
     X_seq, y_seq = [], []
     for i in range(len(X) - timesteps):
-        X_seq.append(X[i:i+timesteps])
-        y_seq.append(y[i+timesteps])
+        X_seq.append(X[i:i + timesteps])  # Maak de sequentie van de features
+        y_seq.append(y[i + timesteps])   # Gebruik NumPy-indexering
     return np.array(X_seq), np.array(y_seq)
+
+
