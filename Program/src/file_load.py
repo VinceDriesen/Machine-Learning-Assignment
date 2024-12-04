@@ -1,5 +1,6 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
 Y_COLUMN = 'Last Close'
@@ -8,6 +9,10 @@ COLUMN_HEADERS = FEATURES + [Y_COLUMN]
 TEST_SIZE = 0.2
 
 def create_test_train_data(train_file=None, test_file=None, full_file=None):
+    # Scalers voor features en target
+    feature_scaler = StandardScaler()
+    target_scaler = StandardScaler()
+
     if full_file:
         data = pd.read_csv(full_file)
         try:
@@ -18,11 +23,17 @@ def create_test_train_data(train_file=None, test_file=None, full_file=None):
         plot_data(data)
 
         data.drop('Date', axis=1, inplace=True)
-
         X = data.drop(Y_COLUMN, axis=1)
         y = data[Y_COLUMN]
+
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, random_state=42)
-        return X_train, y_train, X_test, y_test
+
+        X_train_scaled = feature_scaler.fit_transform(X_train)
+        X_test_scaled = feature_scaler.transform(X_test)
+        y_train_scaled = target_scaler.fit_transform(y_train.values.reshape(-1, 1)).ravel()
+        y_test_scaled = target_scaler.transform(y_test.values.reshape(-1, 1)).ravel()
+
+        return X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled, feature_scaler, target_scaler
     else:
         train_data = pd.read_csv(train_file)
         test_data = pd.read_csv(test_file)
@@ -36,13 +47,20 @@ def create_test_train_data(train_file=None, test_file=None, full_file=None):
         plot_data(train_data)
         plot_data(test_data)
 
-        data.drop('Date', axis=1, inplace=True)
+        train_data.drop('Date', axis=1, inplace=True)
+        test_data.drop('Date', axis=1, inplace=True)
 
         X_train = train_data.drop(Y_COLUMN, axis=1)
         y_train = train_data[Y_COLUMN]
         X_test = test_data.drop(Y_COLUMN, axis=1)
         y_test = test_data[Y_COLUMN]
-        return X_train, y_train, X_test, y_test
+
+        X_train_scaled = feature_scaler.fit_transform(X_train)
+        X_test_scaled = feature_scaler.transform(X_test)
+        y_train_scaled = target_scaler.fit_transform(y_train.values.reshape(-1, 1)).ravel()
+        y_test_scaled = target_scaler.transform(y_test.values.reshape(-1, 1)).ravel()
+
+        return X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled, feature_scaler, target_scaler
 
 def convert_date_to_datetime(data):
     data['Date'] = pd.to_datetime(data['Date'])

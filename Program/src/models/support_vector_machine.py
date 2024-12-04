@@ -14,17 +14,12 @@ def support_vector_machine(X_train, y_train, X_test, y_test):
         mape = calculate_support_vector_machine(X_train, y_train, X_test, y_test, kernel)
         mape_scores.append(mape)
     best_kernel = KERNELS[np.argmin(mape_scores)]
-    return best_kernel
+    return best_kernel, min(mape_scores)
 
 def calculate_support_vector_machine(X_train, y_train, X_test, y_test, kernel_name):
-    # Schalen van de data
-    scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
-
     model = SVR(kernel=kernel_name)
-    model.fit(X_train_scaled, y_train)
-    y_pred = model.predict(X_test_scaled)
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
     mape = mean_absolute_percentage_error(y_test, y_pred)
 
     print(f"Kernel: {kernel_name}")
