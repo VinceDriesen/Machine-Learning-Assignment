@@ -1,10 +1,10 @@
 from sklearn.neural_network import MLPClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, mean_absolute_percentage_error
 from sklearn.preprocessing import StandardScaler
 
 def multilayer_perceptron_classifier(X_train, y_train, X_test, y_test):
-    accuracy = calculate_multilayer_perceptron_classifier(X_train, y_train, X_test, y_test)
-    return accuracy
+    mape = calculate_multilayer_perceptron_classifier(X_train, y_train, X_test, y_test)
+    return mape
 
 def calculate_multilayer_perceptron_classifier(X_train, y_train, X_test, y_test):
     scaler = StandardScaler()
@@ -19,6 +19,8 @@ def calculate_multilayer_perceptron_classifier(X_train, y_train, X_test, y_test)
 
     print("Multilayer Perceptron Classifier:")
     print(f"Accuracy: {accuracy * 100:.2f}%")
+    mape = mean_absolute_percentage_error(y_test, y_pred)
+    print(f"Multilayer perceptron MAPE: {mape * 100:.2f}%")
     print(f"---------------------------------")
 
-    return accuracy
+    return mape

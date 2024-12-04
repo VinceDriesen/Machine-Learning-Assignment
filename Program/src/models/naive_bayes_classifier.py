@@ -1,10 +1,10 @@
 from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, mean_absolute_percentage_error
 from sklearn.preprocessing import StandardScaler
 
 def naive_bayes_classifier(X_train, y_train, X_test, y_test):
-    accuracy = calculate_naive_bayes_classifier(X_train, y_train, X_test, y_test)
-    return accuracy
+    mape = calculate_naive_bayes_classifier(X_train, y_train, X_test, y_test)
+    return mape
 
 def calculate_naive_bayes_classifier(X_train, y_train, X_test, y_test):
     scaler = StandardScaler()
@@ -17,6 +17,8 @@ def calculate_naive_bayes_classifier(X_train, y_train, X_test, y_test):
 
     print("Naive Bayes Classifier:")
     print(f"Accuracy: {accuracy * 100:.2f}%")
+    mape = mean_absolute_percentage_error(y_test, y_pred)
+    print(f"Naive bayes classifier MAPE: {mape * 100:.2f}%")
     print(f"---------------------------------")
 
-    return accuracy
+    return mape
