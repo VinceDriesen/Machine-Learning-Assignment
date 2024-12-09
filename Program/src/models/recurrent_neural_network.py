@@ -1,12 +1,9 @@
 import torch
 import torch.nn as nn
-from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_percentage_error
-
 from src.models.long_short_term_memory import prepare_sequences
 
 
-# RNN Model
 class RNNRegressor(nn.Module):
     def __init__(self, input_dim, hidden_dim, num_layers, output_dim):
         super(RNNRegressor, self).__init__()
@@ -15,22 +12,20 @@ class RNNRegressor(nn.Module):
 
     def forward(self, x):
         out, _ = self.rnn(x)
-        out = self.fc(out[:, -1, :])
+        out = self.fc(out[:, -1, :])  # Alleen de laatste tijdstap nemen
         return out
+
 
 def recurrent_neural_network_regressor(X_train, y_train, X_test, y_test):
     mape = calculate_recurrent_neural_network_regressor(X_train, y_train, X_test, y_test)
     return mape
 
-def calculate_recurrent_neural_network_regressor(X_train, y_train, X_test, y_test, timesteps=5, epochs=50, batch_size=16, lr=0.001):
-    # Data schalen
-    scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
 
+def calculate_recurrent_neural_network_regressor(X_train, y_train, X_test, y_test, timesteps=5, epochs=50,
+                                                 batch_size=16, lr=0.001):
     # Data voorbereiden
-    X_train_seq, y_train_seq = prepare_sequences(X_train_scaled, y_train, timesteps)
-    X_test_seq, y_test_seq = prepare_sequences(X_test_scaled, y_test, timesteps)
+    X_train_seq, y_train_seq = prepare_sequences(X_train, y_train, timesteps)
+    X_test_seq, y_test_seq = prepare_sequences(X_test, y_test, timesteps)
 
     # Omzetten naar PyTorch tensors
     X_train_tensor = torch.tensor(X_train_seq, dtype=torch.float32)
@@ -39,12 +34,13 @@ def calculate_recurrent_neural_network_regressor(X_train, y_train, X_test, y_tes
     y_test_tensor = torch.tensor(y_test_seq, dtype=torch.float32)
 
     # Model Initialiseren
-    input_dim = X_train.shape[1]
-    hidden_dim = 50
-    num_layers = 1
-    output_dim = 1
+    input_dim = X_train.shape[1]  # Aantal kenmerken
+    hidden_dim = 50  # Aantal verborgen eenheden
+    num_layers = 1  # Aantal lagen in RNN
+    output_dim = 1  # Output dimensie (1 voor regressie)
+
     model = RNNRegressor(input_dim, hidden_dim, num_layers, output_dim)
-    criterion = nn.MSELoss()
+    criterion = nn.MSELoss()  # Je kunt ook L1Loss proberen
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
     # Training
