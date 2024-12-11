@@ -6,7 +6,7 @@ from src.models.support_vector_machine import support_vector_machine
 from src.file_load import create_test_train_data
 from src.models.multilayer_perceptron import multilayer_perceptron_regressor
 from src.models.long_short_term_memory import lstm_regressor
-from src.models.recurrent_neural_network import recurrent_neural_network_regressor
+from src.models.recurrent_neural_network import run_grid_search, recurrent_neural_network_regressor
 
 __author__ = "Thibo De Belie, Vince Driesen, Daan Hollands"
 __version__ = "0.1.0"
@@ -31,7 +31,9 @@ def main(args):
         best_kernel, mapeSVM = support_vector_machine(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
         mapeMLP = multilayer_perceptron_regressor(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
         mapeLSTM = lstm_regressor(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
-        mapeRNN = recurrent_neural_network_regressor(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
+        """ Manier om na te gaan welke data input het beste is voor de RNN """
+        # run_grid_search(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
+        mapeRNN = recurrent_neural_network_regressor(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled, 5, 50, 16, 0.001, 50, 1)
 
         # Resultaten printen
         print(f"---------------------------------")
