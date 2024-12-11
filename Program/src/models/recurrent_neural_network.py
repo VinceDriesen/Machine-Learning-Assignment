@@ -81,7 +81,7 @@ def recurrent_neural_network_regressor(X_train, y_train, X_test, y_test, timeste
     plot_predictions(y_test_seq, y_pred_test, title=f"RNN Regressor - hidden_size={hidden_size}, num_layers={num_layers}, lr={lr} - MAPE: {mape * 100:.2f}%")
     return mape
 
-def run_grid_search(X_train, y_train, X_test, y_test, timesteps=5, epochs=50, batch_size=16):
+def run_grid_search_rnn(X_train, y_train, X_test, y_test, timesteps=5, epochs=50, batch_size=16):
     hidden_sizes = [10, 20, 50]
     num_layers_list = [1, 2]
     learning_rates = [0.001, 0.01, 0.1]
