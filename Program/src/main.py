@@ -4,7 +4,6 @@ Module Docstring
 """
 from src.models.support_vector_machine import support_vector_machine
 from src.file_load import create_test_train_data
-from src.models.naive_bayes_classifier import naive_bayes_regressor
 from src.models.multilayer_perceptron import multilayer_perceptron_regressor
 from src.models.long_short_term_memory import lstm_regressor
 from src.models.recurrent_neural_network import recurrent_neural_network_regressor
@@ -30,7 +29,6 @@ def main(args):
             train_file=training_file, test_file=testing_file)
 
         best_kernel, mapeSVM = support_vector_machine(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
-        mapeNB = naive_bayes_regressor(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
         mapeMLP = multilayer_perceptron_regressor(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
         mapeLSTM = lstm_regressor(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
         mapeRNN = recurrent_neural_network_regressor(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
@@ -38,7 +36,6 @@ def main(args):
         # Resultaten printen
         print(f"---------------------------------")
         print(f"The best kernel is: {best_kernel} with a MAPE: {mapeSVM * 100:.2f}%")
-        print(f"Naive Bayes Regressor MAPE: {mapeNB * 100:.2f}%")
         print(f"Multilayer Perceptron Regressor MAPE: {mapeMLP * 100:.2f}%")
         print(f"LSTM Regressor MAPE: {mapeLSTM * 100:.2f}%")
         print(f"RNN Regressor MAPE: {mapeRNN * 100:.2f}%")
