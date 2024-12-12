@@ -4,7 +4,7 @@ Module Docstring
 """
 from src.models.support_vector_machine import support_vector_machine
 from src.file_load import create_test_train_data
-from src.models.multilayer_perceptron import multilayer_perceptron_regressor
+from src.models.multilayer_perceptron import multilayer_perceptron_regressor, run_grid_search_mlp
 from src.models.long_short_term_memory import calculate_lstm_regressor, run_grid_search_lstm
 from src.models.recurrent_neural_network import run_grid_search_rnn, recurrent_neural_network_regressor
 
@@ -28,21 +28,22 @@ def main(args):
         X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled, feature_scaler, target_scaler = create_test_train_data(
             train_file=training_file, test_file=testing_file)
 
-        best_kernel, mapeSVM = support_vector_machine(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
-        mapeMLP = multilayer_perceptron_regressor(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
+        # best_kernel, mapeSVM = support_vector_machine(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
+        run_grid_search_mlp(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
+        # mapeMLP = multilayer_perceptron_regressor(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
         """ Manier om na te gaan welke data input het beste is voor de LSTM """
-        # run_grid_search_lstm(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
-        mapeLSTM = calculate_lstm_regressor(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled, 5, 100, 8, 0.001, 50, 1)
+        run_grid_search_lstm(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
+        # mapeLSTM = calculate_lstm_regressor(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled, 5, 100, 8, 0.001, 50, 1)
         """ Manier om na te gaan welke data input het beste is voor de RNN """
-        # run_grid_search(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
-        mapeRNN = recurrent_neural_network_regressor(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled, 5, 100, 8, 0.001, 50, 1)
+        run_grid_search_rnn(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
+        # mapeRNN = recurrent_neural_network_regressor(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled, 5, 100, 8, 0.001, 50, 1)
 
         # Resultaten printen
         print(f"---------------------------------")
-        print(f"The best kernel is: {best_kernel} with a MAPE: {mapeSVM * 100:.2f}%")
-        print(f"Multilayer Perceptron Regressor MAPE: {mapeMLP * 100:.2f}%")
-        print(f"LSTM Regressor MAPE: {mapeLSTM * 100:.2f}%")
-        print(f"RNN Regressor MAPE: {mapeRNN * 100:.2f}%")
+        # print(f"The best kernel is: {best_kernel} with a MAPE: {mapeSVM * 100:.2f}%")
+        # print(f"Multilayer Perceptron Regressor MAPE: {mapeMLP * 100:.2f}%")
+        # print(f"LSTM Regressor MAPE: {mapeLSTM * 100:.2f}%")
+        # print(f"RNN Regressor MAPE: {mapeRNN * 100:.2f}%")
     except FileNotFoundError as e:
         print(f"Error: {e}")
     except Exception as e:
