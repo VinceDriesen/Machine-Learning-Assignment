@@ -90,11 +90,11 @@ def recurrent_neural_network_regressor(X_train, y_train, X_test, y_test, timeste
 
 
 def run_grid_search_rnn(X_train, y_train, X_test, y_test, output_csv="rnn.csv"):
-    hidden_dims = [10, 20, 50, 100]
+    hidden_dims = [10, 50, 100]
     num_layers_list = [1, 2]
     learning_rates = [0.001, 0.01, 0.1]
-    timesteps = [1, 2, 4, 6, 8, 10]
-    epochs = [50, 100, 150, 200]
+    timesteps = [1,5,10]
+    epochs = [50, 100, 150]
     batch_size = [4, 8, 16]
 
     best_mape = float('inf')
