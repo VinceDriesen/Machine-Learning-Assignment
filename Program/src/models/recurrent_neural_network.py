@@ -11,9 +11,15 @@ from itertools import product
 
 def grid_search_worker(params):
     hidden_dim, num_layers, lr, ts, epoch, bs, X_train, y_train, X_test, y_test = params
-    return recurrent_neural_network_regressor(
-        X_train, y_train, X_test, y_test, ts, epoch, bs, lr, hidden_dim, num_layers
-    )
+    results = []
+    for i in range(1, 4):  # Herhaal 3 keer
+        mape, r2 = recurrent_neural_network_regressor(
+            X_train, y_train, X_test, y_test, ts, epoch, bs, lr, hidden_dim, num_layers
+        )
+        results.append((hidden_dim, num_layers, lr, ts, epoch, bs, i, mape, r2))
+        print(f"[Iteration {i}] MAPE: {mape * 100:.2f}%, R²: {r2:.4f} | hidden_dim={hidden_dim}, num_layers={num_layers}, "
+              f"lr={lr}, timesteps={ts}, epochs={epoch}, batch_size={bs}")
+    return results
 
 def run_grid_search_rnn_parallel(X_train, y_train, X_test, y_test, output_csv="rnn.csv"):
     hidden_dims = [10, 50, 100]
