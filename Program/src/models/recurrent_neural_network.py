@@ -42,12 +42,12 @@ def run_grid_search_rnn_parallel(X_train, y_train, X_test, y_test, output_csv="r
             ["hidden_dim", "num_layers", "learning_rate", "timesteps", "epochs", "batch_size", "iteration", "MAPE", "R²"])
 
         with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
-            results = pool.map(grid_search_worker, param_combinations)
+            all_results = pool.map(grid_search_worker, param_combinations)
 
-        for (params, (mape, r2)) in zip(param_combinations, results):
-            for iteration in range(1, 4):
-                hidden_dim, num_layers, lr, ts, epoch, bs, _, _, _, _ = params
-                writer.writerow([hidden_dim, num_layers, lr, ts, epoch, bs, 1, mape, r2])  # Adjust iteration as needed
+        for result_set in all_results:
+            for result in result_set:
+                hidden_dim, num_layers, lr, ts, epoch, bs, iteration, mape, r2 = result
+                writer.writerow([hidden_dim, num_layers, lr, ts, epoch, bs, iteration, mape, r2])
 
                 if mape < best_mape:
                     best_mape = mape
