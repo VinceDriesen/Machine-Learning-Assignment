@@ -18,11 +18,12 @@ class LSTMRegressor(nn.Module):
         out = self.fc(out[:, -1, :])
         return out
 
-def train_model(num_epochs, model, train_loader, criterion, optimizer):
+def train_model(num_epochs, model, train_loader, criterion, optimizer, device):
     model.train()
     for epoch in range(num_epochs):
         epoch_loss = 0.0
         for X_batch, y_batch in train_loader:
+            X_batch, y_batch = X_batch.to(device), y_batch.to(device)
             optimizer.zero_grad()
             y_pred = model(X_batch)
             loss = criterion(y_pred.squeeze(), y_batch)
@@ -47,13 +48,17 @@ def plot_predictions(y_test, y_pred, title="Model Predictions vs Actual Values")
     plt.show()
 
 def calculate_lstm_regressor(X_train, y_train, X_test, y_test, timesteps=5, epochs=50, batch_size=16, lr=0.001, hidden_dim=50, num_layers=1):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    
+    print(f"Using device: {device}")
+
     X_train_seq, y_train_seq = prepare_sequences(X_train, y_train, timesteps)
     X_test_seq, y_test_seq = prepare_sequences(X_test, y_test, timesteps)
 
-    X_train_tensor = torch.tensor(X_train_seq, dtype=torch.float32)
-    y_train_tensor = torch.tensor(y_train_seq, dtype=torch.float32)
-    X_test_tensor = torch.tensor(X_test_seq, dtype=torch.float32)
-    y_test_tensor = torch.tensor(y_test_seq, dtype=torch.float32)
+    X_train_tensor = torch.tensor(X_train_seq, dtype=torch.float32).to(device)
+    y_train_tensor = torch.tensor(y_train_seq, dtype=torch.float32).to(device)
+    X_test_tensor = torch.tensor(X_test_seq, dtype=torch.float32).to(device)
+    y_test_tensor = torch.tensor(y_test_seq, dtype=torch.float32).to(device)
 
     train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
@@ -61,15 +66,42 @@ def calculate_lstm_regressor(X_train, y_train, X_test, y_test, timesteps=5, epoc
     input_dim = X_train.shape[1]
     output_dim = 1
 
-    model = LSTMRegressor(input_dim, hidden_dim, num_layers, output_dim)
+    model = LSTMRegressor(input_dim, hidden_dim, num_layers, output_dim).to(device)
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
-    train_model(epochs, model, train_loader, criterion, optimizer)
+    # Use mixed precision if CUDA is available
+    if torch.cuda.is_available():
+        scaler = torch.amp.GradScaler()
+
+    for epoch in range(epochs):
+        epoch_loss = 0.0
+        for X_batch, y_batch in train_loader:
+            X_batch, y_batch = X_batch.to(device), y_batch.to(device)
+            optimizer.zero_grad()
+
+            if torch.cuda.is_available():
+                with torch.amp.autocast(device_type='cuda'):  # Mixed precision
+                    y_pred = model(X_batch)
+                    loss = criterion(y_pred.squeeze(), y_batch)
+                scaler.scale(loss).backward()  # Backpropagate with mixed precision
+                scaler.step(optimizer)
+                scaler.update()
+            else:
+                y_pred = model(X_batch)
+                loss = criterion(y_pred.squeeze(), y_batch)
+                loss.backward()
+                optimizer.step()
+
+            epoch_loss += loss.item()
+
+        if (epoch + 1) % 10 == 0:
+            avg_loss = epoch_loss / len(train_loader)
+            print(f'Epoch [{epoch + 1}/{epochs}], Loss: {avg_loss:.4f}')
 
     model.eval()
     with torch.no_grad():
-        y_pred_test = model(X_test_tensor).squeeze().numpy()
+        y_pred_test = model(X_test_tensor).squeeze().cpu().numpy()
 
     mape = mean_absolute_percentage_error(y_test_seq, y_pred_test)
     r2 = r2_score(y_test_seq, y_pred_test)
@@ -94,7 +126,7 @@ def run_grid_search_lstm(X_train, y_train, X_test, y_test, output_csv="lstm.csv"
 
     results = []
 
-    # Gebruik concurrent.futures om verschillende hidden_dims parallel uit te voeren
+    # Use concurrent.futures to execute different hidden_dims in parallel
     with concurrent.futures.ProcessPoolExecutor(max_workers=3) as executor:
         futures = []
         for hidden_dim in hidden_dims:
@@ -127,7 +159,7 @@ def run_grid_search_lstm(X_train, y_train, X_test, y_test, output_csv="lstm.csv"
                         'batch_size': bs
                     }
 
-    # Schrijf alle resultaten naar het CSV-bestand
+    # Write results to CSV file
     with open(output_csv, mode='w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["hidden_dim", "num_layers", "learning_rate", "timesteps", "epochs", "batch_size", "iteration", "MAPE", "R²"])

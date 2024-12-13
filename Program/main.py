@@ -11,7 +11,7 @@ from src.models.support_vector_machine import support_vector_machine
 from src.file_load import create_test_train_data
 from src.models.multilayer_perceptron import multilayer_perceptron_regressor, run_grid_search_mlp
 from src.models.long_short_term_memory import calculate_lstm_regressor, run_grid_search_lstm
-from src.models.recurrent_neural_network import run_grid_search_rnn, recurrent_neural_network_regressor
+from src.models.recurrent_neural_network import run_grid_search_rnn, recurrent_neural_network_regressor, run_grid_search_rnn_parallel
 
 __author__ = "Thibo De Belie, Vince Driesen, Daan Hollands"
 __version__ = "0.1.0"
@@ -22,8 +22,8 @@ import os
 
 def main(args):
     try:
-        training_file = args.training_file if args.training_file else "../resources/TrainingData.csv"
-        testing_file = args.testing_file if args.testing_file else "../resources/testingData.csv"
+        training_file = args.training_file if args.training_file else "./resources/TrainingData.csv"
+        testing_file = args.testing_file if args.testing_file else "./resources/testingData.csv"
         if not os.path.exists(training_file):
             raise FileNotFoundError(f"Training data file not found: {training_file}")
         if not os.path.exists(testing_file):
@@ -37,10 +37,11 @@ def main(args):
         # run_grid_search_mlp(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
         # mapeMLP = multilayer_perceptron_regressor(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
         """ Manier om na te gaan welke data input het beste is voor de LSTM """
-        run_grid_search_lstm(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
+        # run_grid_search_lstm(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
         # mapeLSTM = calculate_lstm_regressor(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled, 5, 100, 8, 0.001, 50, 1)
         """ Manier om na te gaan welke data input het beste is voor de RNN """
         # run_grid_search_rnn(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
+        run_grid_search_rnn_parallel(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
         # mapeRNN = recurrent_neural_network_regressor(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled, 5, 100, 8, 0.001, 50, 1)
 
         # Resultaten printen

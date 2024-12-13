@@ -6,6 +6,60 @@ from torch.utils.data import DataLoader, TensorDataset
 import matplotlib.pyplot as plt
 from src.models.long_short_term_memory import prepare_sequences
 
+import multiprocessing
+from itertools import product
+
+def grid_search_worker(params):
+    hidden_dim, num_layers, lr, ts, epoch, bs, X_train, y_train, X_test, y_test = params
+    return recurrent_neural_network_regressor(
+        X_train, y_train, X_test, y_test, ts, epoch, bs, lr, hidden_dim, num_layers
+    )
+
+def run_grid_search_rnn_parallel(X_train, y_train, X_test, y_test, output_csv="rnn.csv"):
+    hidden_dims = [10, 50, 100]
+    num_layers_list = [1, 2]
+    learning_rates = [0.001, 0.01, 0.1]
+    timesteps = [1, 5, 10]
+    epochs = [50, 100, 150]
+    batch_size = [4, 8, 16]
+
+    param_combinations = list(product(hidden_dims, num_layers_list, learning_rates, timesteps, epochs, batch_size))
+    param_combinations = [(hd, nl, lr, ts, ep, bs, X_train, y_train, X_test, y_test) for hd, nl, lr, ts, ep, bs in param_combinations]
+
+    best_mape = float('inf')
+    best_r2 = -float('inf')
+    best_params = {}
+
+    with open(output_csv, mode='w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(
+            ["hidden_dim", "num_layers", "learning_rate", "timesteps", "epochs", "batch_size", "iteration", "MAPE", "R²"])
+
+        with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+            results = pool.map(grid_search_worker, param_combinations)
+
+        for (params, (mape, r2)) in zip(param_combinations, results):
+            hidden_dim, num_layers, lr, ts, epoch, bs, _, _, _, _ = params
+            writer.writerow([hidden_dim, num_layers, lr, ts, epoch, bs, 1, mape, r2])  # Adjust iteration as needed
+
+            if mape < best_mape:
+                best_mape = mape
+                best_params = {
+                    'hidden_dim': hidden_dim,
+                    'num_layers': num_layers,
+                    'learning_rate': lr,
+                    'timesteps': ts,
+                    'epochs': epoch,
+                    'batch_size': bs
+                }
+            if r2 > best_r2:
+                best_r2 = r2
+
+    print(f"Best MAPE: {best_mape * 100:.2f}% with params: {best_params}")
+    print(f"Best R²: {best_r2:.4f}")
+    print(f"Results saved to {output_csv}")
+
+
 class RNNRegressor(nn.Module):
     def __init__(self, input_dim, hidden_size, num_layers, output_size):
         super(RNNRegressor, self).__init__()
@@ -21,15 +75,36 @@ class RNNRegressor(nn.Module):
 
 def train_model(num_epochs, model, train_loader, criterion, optimizer, device):
     model.train()
+
+    # Print device information
+    print(f"Using device: {device}")
+    if torch.cuda.is_available():
+        print(f"CUDA is available: {torch.cuda.get_device_name(torch.cuda.current_device())}")
+    else:
+        print("CUDA is not available.")
+
+    # Use mixed precision if CUDA is available
+    scaler = torch.amp.GradScaler(enabled=torch.cuda.is_available())
+
     for epoch in range(num_epochs):
         epoch_loss = 0.0
         for X_batch, y_batch in train_loader:
             X_batch, y_batch = X_batch.to(device), y_batch.to(device)
             optimizer.zero_grad()
-            outputs = model(X_batch)
-            loss = criterion(outputs.squeeze(), y_batch)
-            loss.backward()
-            optimizer.step()
+
+            if scaler:
+                with torch.amp.autocast(device_type='cuda', enabled=torch.cuda.is_available()):
+                    outputs = model(X_batch)
+                    loss = criterion(outputs.squeeze(), y_batch)
+                scaler.scale(loss).backward()
+                scaler.step(optimizer)
+                scaler.update()
+            else:
+                outputs = model(X_batch)
+                loss = criterion(outputs.squeeze(), y_batch)
+                loss.backward()
+                optimizer.step()
+
             epoch_loss += loss.item()
 
         if (epoch + 1) % 10 == 0:
@@ -60,7 +135,7 @@ def recurrent_neural_network_regressor(X_train, y_train, X_test, y_test, timeste
     y_test_tensor = torch.tensor(y_test_seq, dtype=torch.float32)
 
     train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, pin_memory=torch.cuda.is_available())
 
     input_dim = X_train.shape[1]
     output_dim = 1
@@ -85,15 +160,13 @@ def recurrent_neural_network_regressor(X_train, y_train, X_test, y_test, timeste
     print(f"Test R²: {r2:.4f}")
     print("---------------------------------")
 
-    # plot_predictions(y_test_seq, y_pred_test, title=f"RNN Regressor - hidden_size={hidden_size}, num_layers={num_layers}, lr={lr} - MAPE: {mape * 100:.2f}% - R²: {r2:.4f}")
     return mape, r2
-
 
 def run_grid_search_rnn(X_train, y_train, X_test, y_test, output_csv="rnn.csv"):
     hidden_dims = [10, 50, 100]
     num_layers_list = [1, 2]
     learning_rates = [0.001, 0.01, 0.1]
-    timesteps = [1,5,10]
+    timesteps = [1, 5, 10]
     epochs = [50, 100, 150]
     batch_size = [4, 8, 16]
 
@@ -113,19 +186,13 @@ def run_grid_search_rnn(X_train, y_train, X_test, y_test, output_csv="rnn.csv"):
                     for ts in timesteps:
                         for epoch in epochs:
                             for bs in batch_size:
-                                for iteration in range(1, 4):  # Repeat each combination 5 times
-                                    # print(
-                                    #     f"Training with hidden_dim={hidden_dim}, num_layers={num_layers}, lr={lr}, timesteps={ts}, epochs={epoch}, batch_size={bs}, iteration={iteration}")
-
-                                    # Compute MAPE and R²
+                                for iteration in range(1, 4):  # Repeat each combination 3 times
                                     mape, r2 = recurrent_neural_network_regressor(
                                         X_train, y_train, X_test, y_test, ts, epoch, bs, lr, hidden_dim, num_layers
                                     )
 
-                                    # Write results to CSV file
                                     writer.writerow([hidden_dim, num_layers, lr, ts, epoch, bs, iteration, mape, r2])
 
-                                    # Update best MAPE and R²
                                     if mape < best_mape:
                                         best_mape = mape
                                         best_params = {
@@ -138,7 +205,6 @@ def run_grid_search_rnn(X_train, y_train, X_test, y_test, output_csv="rnn.csv"):
                                         }
                                     if r2 > best_r2:
                                         best_r2 = r2
-                                    # print(f"Iteration {iteration} MAPE: {mape * 100:.2f}% R²: {r2:.4f}\n")
 
     print(f"Best MAPE: {best_mape * 100:.2f}% with params: {best_params}")
     print(f"Best R²: {best_r2:.4f}")
