@@ -1,4 +1,4 @@
-hidden_dim,num_layers,learning_rate,timesteps,epochs,batch_size,iteration,MAPE,R²
+hidden_dim,num_layers,learning_rate,timesteps,epochs,batch_size,iteration,MAPE,Rï¿½
 10,1,0.001,1,50,4,1,0.1358312110583713,0.4374631706934753
 10,1,0.001,1,50,4,2,0.19027281224864626,-0.027131746236463306
 10,1,0.001,1,50,4,3,0.1846117103256376,0.048352745577845635
