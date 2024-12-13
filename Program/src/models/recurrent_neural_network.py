@@ -39,21 +39,22 @@ def run_grid_search_rnn_parallel(X_train, y_train, X_test, y_test, output_csv="r
             results = pool.map(grid_search_worker, param_combinations)
 
         for (params, (mape, r2)) in zip(param_combinations, results):
-            hidden_dim, num_layers, lr, ts, epoch, bs, _, _, _, _ = params
-            writer.writerow([hidden_dim, num_layers, lr, ts, epoch, bs, 1, mape, r2])  # Adjust iteration as needed
+            for iteration in range(1, 4):
+                hidden_dim, num_layers, lr, ts, epoch, bs, _, _, _, _ = params
+                writer.writerow([hidden_dim, num_layers, lr, ts, epoch, bs, 1, mape, r2])  # Adjust iteration as needed
 
-            if mape < best_mape:
-                best_mape = mape
-                best_params = {
-                    'hidden_dim': hidden_dim,
-                    'num_layers': num_layers,
-                    'learning_rate': lr,
-                    'timesteps': ts,
-                    'epochs': epoch,
-                    'batch_size': bs
-                }
-            if r2 > best_r2:
-                best_r2 = r2
+                if mape < best_mape:
+                    best_mape = mape
+                    best_params = {
+                        'hidden_dim': hidden_dim,
+                        'num_layers': num_layers,
+                        'learning_rate': lr,
+                        'timesteps': ts,
+                        'epochs': epoch,
+                        'batch_size': bs
+                    }
+                if r2 > best_r2:
+                    best_r2 = r2
 
     print(f"Best MAPE: {best_mape * 100:.2f}% with params: {best_params}")
     print(f"Best R²: {best_r2:.4f}")
