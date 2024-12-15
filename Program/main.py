@@ -34,14 +34,14 @@ def main(args):
             train_file=training_file, test_file=testing_file)
 
         # best_kernel, mapeSVM = support_vector_machine(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
-        # run_grid_search_mlp(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
+        run_grid_search_mlp(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
         # mapeMLP = multilayer_perceptron_regressor(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
         """ Manier om na te gaan welke data input het beste is voor de LSTM """
         # run_grid_search_lstm(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
         # mapeLSTM = calculate_lstm_regressor(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled, 5, 100, 8, 0.001, 50, 1)
         """ Manier om na te gaan welke data input het beste is voor de RNN """
         # run_grid_search_rnn(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
-        run_grid_search_rnn_parallel(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
+        # run_grid_search_rnn_parallel(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled)
         # mapeRNN = recurrent_neural_network_regressor(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled, 5, 100, 8, 0.001, 50, 1)
 
         # Resultaten printen
