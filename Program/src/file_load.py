@@ -1,5 +1,4 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
@@ -9,12 +8,12 @@ COLUMN_HEADERS = FEATURES + [Y_COLUMN]
 TEST_SIZE = 0.2
 
 def create_test_train_data(train_file, test_file):
-    # Scalers voor features en target
     feature_scaler = StandardScaler()
     target_scaler = StandardScaler()
 
     train_data = pd.read_csv(train_file)
     test_data = pd.read_csv(test_file)
+
     try:
         get_column_names(train_data)
         get_column_names(test_data)

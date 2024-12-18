@@ -13,17 +13,16 @@ class RNNRegressor(nn.Module):
         self.fc = nn.Linear(hidden_size, output_size)
 
     def forward(self, x):
-        h0 = torch.zeros(self.rnn.num_layers, x.size(0), self.hidden_size).to(x.device)
+        h0 = torch.zeros(self.rnn.num_layers, x.size(0), self.hidden_size)
         out, _ = self.rnn(x, h0)
         out = self.fc(out[:, -1, :])
         return out
 
-def train_model(num_epochs, model, train_loader, criterion, optimizer, device):
+def train_model(num_epochs, model, train_loader, criterion, optimizer):
     model.train()
     for epoch in range(num_epochs):
         epoch_loss = 0.0
         for X_batch, y_batch in train_loader:
-            X_batch, y_batch = X_batch.to(device), y_batch.to(device)
             optimizer.zero_grad()
             outputs = model(X_batch)
             loss = criterion(outputs.squeeze(), y_batch)
@@ -48,8 +47,6 @@ def plot_predictions(y_test, y_pred, title="Model Predictions vs Actual Values")
     plt.show()
 
 def recurrent_neural_network_regressor(X_train, y_train, X_test, y_test, timesteps=5, epochs=50, batch_size=16, lr=0.001, hidden_size=20, num_layers=1):
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
     X_train_seq, y_train_seq = prepare_sequences(X_train, y_train, timesteps)
     X_test_seq, y_test_seq = prepare_sequences(X_test, y_test, timesteps)
 
@@ -64,39 +61,18 @@ def recurrent_neural_network_regressor(X_train, y_train, X_test, y_test, timeste
     input_dim = X_train.shape[1]
     output_dim = 1
 
-    model = RNNRegressor(input_dim, hidden_size, num_layers, output_dim).to(device)
+    model = RNNRegressor(input_dim, hidden_size, num_layers, output_dim)
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
-    train_model(epochs, model, train_loader, criterion, optimizer, device)
+    train_model(epochs, model, train_loader, criterion, optimizer)
 
     model.eval()
     with torch.no_grad():
-        X_test_tensor = X_test_tensor.to(device)
+        X_test_tensor = X_test_tensor
         y_pred_test = model(X_test_tensor).squeeze().cpu().numpy()
 
     mape = mean_absolute_percentage_error(y_test_seq, y_pred_test)
-    print(f"Test MAPE: {mape * 100:.2f}%")
 
     plot_predictions(y_test_seq, y_pred_test, title=f"RNN Regressor - hidden_size={hidden_size}, num_layers={num_layers}, lr={lr} - MAPE: {mape * 100:.2f}%")
     return mape
-
-def run_grid_search_rnn(X_train, y_train, X_test, y_test, timesteps=5, epochs=50, batch_size=16):
-    hidden_sizes = [10, 20, 50]
-    num_layers_list = [1, 2]
-    learning_rates = [0.001, 0.01, 0.1]
-
-    best_mape = float('inf')
-    best_params = {}
-
-    for hidden_size in hidden_sizes:
-        for num_layers in num_layers_list:
-            for lr in learning_rates:
-                print(f"Training with hidden_size={hidden_size}, num_layers={num_layers}, lr={lr}")
-                mape = recurrent_neural_network_regressor(X_train, y_train, X_test, y_test, timesteps, epochs, batch_size, lr, hidden_size, num_layers)
-                if mape < best_mape:
-                    best_mape = mape
-                    best_params = {'hidden_size': hidden_size, 'num_layers': num_layers, 'lr': lr}
-                print(f"MAPE: {mape * 100:.2f}%\n")
-
-    print(f"Best MAPE: {best_mape * 100:.2f}% with params: {best_params}")
