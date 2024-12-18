@@ -34,14 +34,13 @@ def train_model(num_epochs, model, train_loader, criterion, optimizer):
             avg_loss = epoch_loss / len(train_loader)
             print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}')
 
-def plot_predictions(y_test, y_pred, title="Model Predictions vs Actual Values"):
+def plot_predictions(y_test, y_pred):
     plt.figure(figsize=(12, 6))
     plt.plot(y_test, label="Actual Values", color='b', marker='o')
     plt.plot(y_pred, label="Predicted Values", color='r', marker='x')
     plt.fill_between(range(len(y_test)), y_test, y_pred, color='gray', alpha=0.2)
     plt.xlabel("Samples")
     plt.ylabel("Values")
-    plt.title(title)
     plt.legend()
     plt.grid(True)
     plt.show()
@@ -74,5 +73,5 @@ def recurrent_neural_network_regressor(X_train, y_train, X_test, y_test, timeste
 
     mape = mean_absolute_percentage_error(y_test_seq, y_pred_test)
 
-    plot_predictions(y_test_seq, y_pred_test, title=f"RNN Regressor - hidden_size={hidden_size}, num_layers={num_layers}, lr={lr} - MAPE: {mape * 100:.2f}%")
+    plot_predictions(y_test_seq, y_pred_test)
     return mape
