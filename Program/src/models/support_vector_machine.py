@@ -30,13 +30,16 @@ def support_vector_machine(X_train, y_train, X_test, y_test):
 
 
 def plot_predictions(test_true, test_pred):
-    plt.figure(figsize=(14, 6))
+    plt.figure(figsize=(10, 6))
 
-    plt.scatter(range(len(test_true)), test_true, color="blue", label="Real values", s=5)
-    plt.scatter(range(len(test_pred)), test_pred, color="orange", label="Predictions", s=5)
+    plt.plot(test_true, label="Actual Values", color='b', marker='o')
+    plt.plot(test_pred, label="Predicted Values", color='r', marker='x')
+    plt.fill_between(range(len(test_true)), test_true, test_pred, color='gray', alpha=0.2)
     plt.xlabel("Index")
     plt.ylabel("Value")
     plt.legend()
+    
+    plt.grid(True)
 
     plt.tight_layout()
     plt.show()
