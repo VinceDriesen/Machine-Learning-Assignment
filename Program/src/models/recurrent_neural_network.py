@@ -43,7 +43,9 @@ def plot_predictions(y_test, y_pred):
     plt.ylabel("Values")
     plt.legend()
     plt.grid(True)
+    plt.tight_layout
     plt.show()
+    plt.savefig('rnn.png')
 
 def recurrent_neural_network_regressor(X_train, y_train, X_test, y_test, timesteps=5, epochs=50, batch_size=16, lr=0.001, hidden_size=20, num_layers=1):
     X_train_seq, y_train_seq = prepare_sequences(X_train, y_train, timesteps)

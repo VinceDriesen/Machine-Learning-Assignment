@@ -40,4 +40,5 @@ def plot_predictions(test_true, test_pred):
 
     plt.tight_layout()
     plt.show()
+    plt.savefig('svm.png')
 
