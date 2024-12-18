@@ -8,8 +8,6 @@ import matplotlib.pyplot as plt
 def multilayer_perceptron_regressor(X_train, y_train, X_test, y_test, hidden_layer_sizes, activation, solver,
                                     learning_rate, max_iter=5000):
     scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
 
     model = MLPRegressor(
         hidden_layer_sizes=hidden_layer_sizes,
@@ -19,8 +17,8 @@ def multilayer_perceptron_regressor(X_train, y_train, X_test, y_test, hidden_lay
         max_iter=max_iter,
         random_state=42
     )
-    model.fit(X_train_scaled, y_train)
-    y_pred = model.predict(X_test_scaled)
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
 
     mape = mean_absolute_percentage_error(y_test, y_pred)
     r2 = r2_score(y_test, y_pred)  # R² toevoegen
