@@ -25,7 +25,6 @@ def plot_predictions(y_test, y_pred):
     plt.plot(y_pred, label='Prediction values', color='red', marker='x', linestyle='-', markersize=5)
     plt.xlabel('Data Points')
     plt.ylabel('Values')
-    plt.title('Real vs. Predicted values - Multilayer er Perceptron Regressor')
     plt.legend()
     plt.grid(True)
     plt.show()
