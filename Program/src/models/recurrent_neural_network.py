@@ -35,7 +35,7 @@ def train_model(num_epochs, model, train_loader, criterion, optimizer):
             print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}')
 
 def plot_predictions(y_test, y_pred):
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(10, 6))
     plt.plot(y_test, label="Actual Values", color='b', marker='o')
     plt.plot(y_pred, label="Predicted Values", color='r', marker='x')
     plt.fill_between(range(len(y_test)), y_test, y_pred, color='gray', alpha=0.2)
