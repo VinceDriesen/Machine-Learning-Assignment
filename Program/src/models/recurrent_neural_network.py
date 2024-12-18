@@ -3,7 +3,7 @@ import torch.nn as nn
 from sklearn.metrics import mean_absolute_percentage_error
 from torch.utils.data import DataLoader, TensorDataset
 import matplotlib.pyplot as plt
-from src.models.long_short_term_memory import prepare_sequences
+from models.long_short_term_memory import prepare_sequences
 
 class RNNRegressor(nn.Module):
     def __init__(self, input_dim, hidden_size, num_layers, output_size):
