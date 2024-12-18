@@ -17,8 +17,8 @@ import os
 
 def main(args):
     try:
-        training_file = args.training_file if args.training_file else "../resources/TrainingData.csv"
-        testing_file = args.testing_file if args.testing_file else "../resources/testingData.csv"
+        training_file = args.training_file if args.training_file else "Program/resources/TrainingData.csv"
+        testing_file = args.testing_file if args.testing_file else "Program/resources/testingData.csv"
         if not os.path.exists(training_file):
             raise FileNotFoundError(f"Training data file not found: {training_file}")
         if not os.path.exists(testing_file):
