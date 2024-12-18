@@ -3,7 +3,7 @@ import torch.nn as nn
 from sklearn.metrics import mean_absolute_percentage_error
 from torch.utils.data import DataLoader, TensorDataset
 import matplotlib.pyplot as plt
-from src.models.long_short_term_memory import prepare_sequences
+from models.long_short_term_memory import prepare_sequences
 
 class RNNRegressor(nn.Module):
     def __init__(self, input_dim, hidden_size, num_layers, output_size):
@@ -43,7 +43,9 @@ def plot_predictions(y_test, y_pred):
     plt.ylabel("Values")
     plt.legend()
     plt.grid(True)
+    plt.tight_layout
     plt.show()
+    plt.savefig('rnn.png')
 
 def recurrent_neural_network_regressor(X_train, y_train, X_test, y_test, timesteps=5, epochs=50, batch_size=16, lr=0.001, hidden_size=20, num_layers=1):
     X_train_seq, y_train_seq = prepare_sequences(X_train, y_train, timesteps)
