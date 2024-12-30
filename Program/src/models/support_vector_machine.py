@@ -34,6 +34,7 @@ def plot_predictions(test_true, test_pred):
 
     plt.scatter(range(len(test_true)), test_true, color="blue", label="Real values", s=5)
     plt.scatter(range(len(test_pred)), test_pred, color="orange", label="Predictions", s=5)
+    plt.title(f"SVM - Predicted vs Real values")
     plt.xlabel("Index")
     plt.ylabel("Value")
     plt.legend()
