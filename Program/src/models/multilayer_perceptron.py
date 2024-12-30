@@ -28,5 +28,7 @@ def plot_predictions(y_test, y_pred):
     plt.ylabel('Values')
     plt.legend()
     plt.grid(True)
+    plt.tight_layout()
     plt.show()
+    plt.savefig('mpr.png')
 

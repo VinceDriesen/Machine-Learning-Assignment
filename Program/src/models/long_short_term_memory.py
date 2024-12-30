@@ -42,7 +42,9 @@ def plot_predictions(y_test, y_pred, title="Model Predictions vs Actual Values w
     plt.ylabel("Values")
     plt.legend()
     plt.grid(True)
+    plt.tight_layout()
     plt.show()
+    plt.savefig('lstm.png')
 
 def calculate_lstm_regressor(X_train, y_train, X_test, y_test, timesteps=5, epochs=50, batch_size=16, lr=0.001, hidden_dim=50, num_layers=1):
     X_train_seq, y_train_seq = prepare_sequences(X_train, y_train, timesteps)
