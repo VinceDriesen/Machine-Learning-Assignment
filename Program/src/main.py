@@ -21,8 +21,12 @@ def get_absolute_path(relative_path):
 
 def main(args):
     try:
-        training_file = args.training_file if args.training_file else get_absolute_path("../resources/TrainingData.csv")
-        testing_file = args.testing_file if args.testing_file else get_absolute_path("../resources/testingData.csv")
+        training_file = args.training_file
+        testing_file = args.testing_file
+        if not training_file:
+            raise FileNotFoundError(f"Training file has not been provided")
+        if not testing_file:
+            raise FileNotFoundError(f"Testing file has not been provided")
         if not os.path.exists(training_file):
             raise FileNotFoundError(f"Training data file not found: {training_file}")
         if not os.path.exists(testing_file):
@@ -53,9 +57,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     # Optional positional arguments
-    parser.add_argument("-t", "--training_file", help="Training data file")
-    parser.add_argument("-e", "--testing_file", help="Testing data file")
-    parser.add_argument("-f", "--full_file", help="Full data file for both training and testing")
+    parser.add_argument("training_file", help="Training data file")
+    parser.add_argument("testing_file", help="Testing data file")
 
     # Specify output of "--version"
     parser.add_argument(
