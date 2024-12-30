@@ -15,6 +15,10 @@ __license__ = "GPLv3"
 import argparse
 import os
 
+def get_absolute_path(relative_path):
+    """ Helper function to get the absolute path from a relative path """
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), relative_path)
+
 def main(args):
     try:
         training_file = args.training_file

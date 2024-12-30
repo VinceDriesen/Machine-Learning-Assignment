@@ -33,7 +33,7 @@ def train_model(num_epochs, model, train_loader, criterion, optimizer):
             print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}')
 
 def plot_predictions(y_test, y_pred):
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(10, 6))
     plt.plot(y_test, label="Actual Values", color='b', marker='o')
     plt.plot(y_pred, label="Predicted Values", color='r', marker='x')
     plt.fill_between(range(len(y_test)), y_test, y_pred, color='gray', alpha=0.2)
@@ -41,7 +41,9 @@ def plot_predictions(y_test, y_pred):
     plt.ylabel("Values")
     plt.legend()
     plt.grid(True)
+    plt.tight_layout()
     plt.show()
+    plt.savefig('lstm.png')
 
 def calculate_lstm_regressor(X_train, y_train, X_test, y_test, timesteps=5, epochs=50, batch_size=16, lr=0.001, hidden_dim=50, num_layers=1):
     X_train_seq, y_train_seq = prepare_sequences(X_train, y_train, timesteps)
