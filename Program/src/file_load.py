@@ -62,6 +62,7 @@ def plot_data(data):
     plt.plot(data['Date'], data['High'], label='High Price', alpha=0.7)
     plt.plot(data['Date'], data['Low'], label='Low Price', alpha=0.7)
     plt.plot(data['Date'], data['Last Close'], label='Last Close Price', alpha=0.7)
+    plt.title("Stock Price Over Time")
     plt.xlabel("Date")
     plt.ylabel("Price")
     plt.legend()
